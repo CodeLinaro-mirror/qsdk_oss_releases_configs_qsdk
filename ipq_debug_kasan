@@ -24,11 +24,11 @@ CONFIG_KERNEL_SKB_DEBUG=y
 CONFIG_KERNEL_SLUB_DEBUG=y
 CONFIG_KERNEL_STACKTRACE=y
 # CONFIG_KERNEL_TIMER_STATS is not set
-CONFIG_PACKAGE_kmod-qca-wifi-minimal-profile=m
+# CONFIG_PACKAGE_kmod-qca-wifi-minimal-profile is not set
 # CONFIG_PACKAGE_MAC80211_MESSAGE_TRACING is not set
 CONFIG_STRIP_ARGS="--strip-unneeded --remove-section=.comment --remove-section=.note"
 # CONFIG_USE_SSTRIP is not set
 CONFIG_USE_STRIP=y
-CONFIG_WIFI_CE_TASKLET_DEBUG=y
-CONFIG_WIFI_LOG_UTILS=y
-CONFIG_WIFI_MEM_DEBUG=y
+# CONFIG_WIFI_CE_TASKLET_DEBUG is not set
+# CONFIG_WIFI_LOG_UTILS is not set
+# CONFIG_WIFI_MEM_DEBUG is not set
