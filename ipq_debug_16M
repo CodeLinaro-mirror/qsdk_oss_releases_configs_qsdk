@@ -1,3 +1,4 @@
+CONFIG_DEBUG=y
 CONFIG_PACKAGE_ftm=y
 CONFIG_PACKAGE_kmod-ata-ahci=y
 CONFIG_PACKAGE_kmod-ata-core=y
