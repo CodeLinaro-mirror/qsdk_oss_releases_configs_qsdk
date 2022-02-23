@@ -27,6 +27,6 @@ CONFIG_STRIP_ARGS="--strip-unneeded --remove-section=.comment --remove-section=.
 CONFIG_USE_STRIP=y
 # CONFIG_WIFI_CE_TASKLET_DEBUG is not set
 # CONFIG_WIFI_LOG_UTILS is not set
-# CONFIG_WIFI_MEM_DEBUG is not set
+CONFIG_WIFI_MEM_DEBUG=y
 # CONFIG_WIFI_VDEV_PEER_PROT_COUNT is not set
 # CONFIG_WIFI_VDEV_PEER_PROT_TESTING is not set
