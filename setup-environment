@@ -1,0 +1,125 @@
+#
+# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+
+#!/bin/bash
+
+if [ "$#" -gt 0 ]; then
+    if [ "$1" == "-h" ]; then
+        echo "Usage: Provide target, arch and profile type for entire build (Please run \"make clean\" if this is an existing workspace)" >&2
+        exit 1
+    fi
+fi
+
+#echo "Help options, Run command with -h [$0 -h]"
+echo ""
+echo -e "\t1) ipq807x ( Hawkeye )"
+echo -e "\t2) ipq60xx ( Cypress )"
+echo -e "\t3) ipq50xx ( Maple ) "
+echo -e "\t4) ipq95xx ( Alder ) "
+read -p "Please enter your choice of target[1..4] : " in_soc
+echo ""
+
+if [[ $in_soc -lt 1 || $in_soc -gt 4 ]]; then
+    echo "wrong input.. exit"
+    exit 1
+fi
+
+echo -e "\t1) 32 Bit"
+echo -e "\t2) 64 bit"
+read -p "Please enter your choice of build type[1..2] : " in_arch
+echo ""
+
+if [[ $in_arch -lt 1 || $in_arch -gt 2 ]]; then
+    echo "wrong input.. exit"
+    exit 1
+fi
+
+echo -e "\t1) Premium"
+echo -e "\t2) Enterprise"
+echo -e "\t3) Open"
+echo -e "\t4) 512"
+echo -e "\t5) 512 Enterprise"
+echo -e "\t6) 512 Open"
+echo -e "\t7) 256"
+read -p "Please enter your choice of profile[1..7] : " in_profile
+echo ""
+
+if [[ $in_profile -lt 1 || $in_profile -gt 7 ]]; then
+    echo "wrong input.. exit"
+    exit 1
+fi
+
+declare -a profile_list
+declare -a soc_list
+declare -a arch_list
+
+profile_list=("Premium" "Enterprise" "Open" "512" "512Enterprise" "512Open" "256")
+cfg_profile_list=("premium" "enterprise" "open" "512" "512enterprise" "512open" "256")
+soc_list=("ipq807x" "ipq60xx" "ipq50xx" "ipq95xx")
+arch_list=("32" "64")
+
+cfg_profile=${cfg_profile_list[$in_profile-1]}
+soc=${soc_list[$in_soc-1]}
+arch=${arch_list[$in_arch-1]}
+profile=${profile_list[$in_profile-1]}
+
+if [ $profile = "512Enterprise" ]; then
+    profile="Enterprise"
+elif [ $profile = "512Open" ]; then
+    profile="Open"
+fi
+
+echo "Profile Selected: [$cfg_profile] SOC[$soc] ARCH[$arch]"
+echo ""
+make package/symlinks
+# Copy configs
+cp qca/configs/qsdk/ipq_$cfg_profile.config .config
+echo "CONFIG_TARGET_${soc}=y" >> .config
+echo ""
+echo CONFIG_TARGET_"$soc"=y
+
+if [ "$arch" -eq "64" ]; then
+
+    echo "CONFIG_TARGET_${soc}_generic=y" >> .config
+    echo "CONFIG_TARGET_${soc}_generic_QSDK_${profile}=y" >> .config
+
+    echo "CONFIG_TARGET_${soc}_generic=y"
+    echo "CONFIG_TARGET_${soc}_generic_QSDK_${profile}=y"
+else
+
+    echo "CONFIG_TARGET_${soc}_${soc}_32=y" >> .config
+    echo "CONFIG_TARGET_${soc}_${soc}_32_QSDK_${profile}=y" >> .config
+
+    echo "CONFIG_TARGET_${soc}_${soc}_32=y"
+    echo "CONFIG_TARGET_${soc}_${soc}_32_QSDK_${profile}=y"
+
+fi
+
+# Run "make defconfig"
+echo ""
+echo '================= Executing "make defconfig" =============='
+make defconfig
+echo ""
+echo '================= .config is generated, you can build '$soc' for '$profile' using below commands =============='
+
+echo ""
+echo "PLEASE RUN MAKE COMMAND FROM THE LIST OF BUILD OPTIONS AVAILABLE :"
+echo -e "\t\t make -j8 V=s (Verbose logs)"
+echo -e "\t\t make -j8 V=e (No detailed logs)"
+echo -e "\t\t time make -j8 V=e (Verbose logs with total time taken by build)"
+echo ""
+echo "************ If you face any error, please rerun with 'make -j1 V=s'.*************"
+echo ""
