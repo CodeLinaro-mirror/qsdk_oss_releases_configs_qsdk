@@ -84,6 +84,7 @@ fi
 
 echo "Profile Selected: [$cfg_profile] SOC[$soc] ARCH[$arch]"
 echo ""
+umask 022
 make package/symlinks
 # Copy configs
 cp qca/configs/qsdk/ipq_$cfg_profile.config .config
