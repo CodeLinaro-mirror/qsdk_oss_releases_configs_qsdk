@@ -29,7 +29,7 @@ if [ "$#" -gt 0 ]; then
 fi
 
 #echo "Help options, Run command with -h [$0 -h]"
-soc_list=("ipq807x" "ipq60xx" "ipq50xx" "ipq95xx")
+soc_list=("ipq807x" "ipq60xx" "ipq50xx" "ipq95xx" "ipq53xx")
 arch_list=("32" "64")
 
 populate_profile_list()
@@ -52,10 +52,11 @@ read_inputs()
 	echo -e "\t2) ipq60xx ( Cypress )"
 	echo -e "\t3) ipq50xx ( Maple ) "
 	echo -e "\t4) ipq95xx ( Alder ) "
-	read -p "Please enter your choice of target[1..4] : " in_soc
+	echo -e "\t5) ipq53xx ( Miami ) "
+	read -p "Please enter your choice of target[1..5] : " in_soc
 	echo ""
 
-	if [[ $in_soc -lt 1 || $in_soc -gt 4 ]]; then
+	if [[ $in_soc -lt 1 || $in_soc -gt 5 ]]; then
 	        echo "Wrong input.. exiting"
 		return 0
 	fi
