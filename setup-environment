@@ -118,7 +118,7 @@ read_inputs()
 
 		if [[ $in_soc -lt 1 || $in_soc -gt 5 ]]; then
 			echo "Wrong input.. exiting"
-			return 0
+			return 1
 		fi
 		in_soc=${soc_list[$in_soc-1]}
 	fi
@@ -131,7 +131,7 @@ read_inputs()
 
 		if [[ $in_arch -lt 1 || $in_arch -gt 2 ]]; then
 		        echo "Wrong input.. exiting"
-			return 0
+			return 1
 		fi
 		in_arch=${arch_list[$in_arch-1]}
 	fi
@@ -156,7 +156,7 @@ read_inputs()
 		read -p "Choose the profile [1..${#profile[@]}] : " input
 		if [[ $input -lt 1 || $input -gt ${#profile[@]} ]];then
 			echo "Please enter a valid input...Exiting"
-			return 0
+			return 1
 		fi
 	else
 		index=0
@@ -228,7 +228,7 @@ read_inputs()
 				       ;;
 
 				*)	echo "Wrong input .... exiting"
-					return 0
+					return 1
 					;;
 		       esac
 		       ;;
@@ -238,7 +238,7 @@ read_inputs()
 		       ;;
 		*)
 			echo "Wrong input .... exiting"
-			return 0
+			return 1
 			;;
 	esac
 	echo "CONFIG_TARGET_${qsdk_target}=y" >> $TOP_DIR/.config
@@ -246,12 +246,12 @@ read_inputs()
 	# Set subtarget
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}=y" >> $TOP_DIR/.config
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}_${pname}=y" >> $TOP_DIR/.config
-	return 1
+	return 0
 }
 
 read_inputs $@
 ret_val=$?
-if [ $ret_val != 0 ];then
+if [ $ret_val == 0 ];then
 	cd $TOP_DIR
 	umask 022
 	make package/symlinks
