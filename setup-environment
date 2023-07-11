@@ -25,10 +25,10 @@ ret_val=1
 #echo "Help options, Run command with -h [$0 -h]"
 usage()
 {
-	echo "Usage: $0 [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium>] [-d <y|n>] [-i <Debug|Debug+Kasan>]" 1>&2;
+	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium>] [-d <y|n>] [-i <Debug|Debug+Kasan>]" 1>&2;
 	echo "For eg:"
-	echo "$0 -t ipq807x -a 32 -p premium -d n"
-	echo "$0 -t ipq53xx -a 64 -p open -d y -i Debug"
+	echo "qca/configs/qsdk/setup-environment -t ipq807x -a 32 -p premium -d n"
+	echo "qca/configs/qsdk/setup-environment -t ipq53xx -a 64 -p open -d y -i Debug"
 	echo "Please run \"make clean\" if this is an existing workspace"
 	exit 1;
 }
@@ -174,20 +174,6 @@ read_inputs()
 	pname=${profile_name[$(( $input -1 ))]}
 	echo -e "\n\033[36mSelected configuration: ${qsdk_target} - ${qsdk_subtarget} - ${qsdk_profile}\033[0m"
 
-	# running sed command to set ARCH for Big Endian profile
-	if [ ${qsdk_profile} == "ipq_bigendian" ]
-	then
-		if [ $arch == 64 ]
-		then
-			sed 's/ARCH:=aarch64/ARCH:=aarch64_be/g' -i $TOP_DIR/target/linux/${qsdk_target}/Makefile
-		else
-			sed 's/ARCH:=arm/ARCH:=armeb/g' -i $TOP_DIR/target/linux/${qsdk_target}/${qsdk_target}_32/target.mk
-		fi
-	else
-		sed 's/ARCH:=aarch64_be/ARCH:=aarch64/g' -i $TOP_DIR/target/linux/${qsdk_target}/Makefile
-		sed 's/ARCH:=armeb/ARCH:=arm/g' -i $TOP_DIR/target/linux/${qsdk_target}/${qsdk_target}_32/target.mk
-	fi
-
 	if [ -z $debug_in ]; then
 		read -p "Debug build required ? [y/n] : " debug_in
 	fi
@@ -258,6 +244,10 @@ if [ $ret_val != 0 ];then
 	echo -e "\n================= Executing "make defconfig" =============="
 	make defconfig
 
+	echo -e "\033[0;32m# Selected target:      $(grep CONFIG_TARGET_BOARD= .config | cut -d "\"" -f 2)\033[0m"
+	echo -e "\033[0;32m# Selected subtarget:   $(grep CONFIG_TARGET_SUBTARGET= .config | cut -d "\"" -f 2)\033[0m"
+	echo -e "\033[0;32m# Selected profile:     $(grep CONFIG_TARGET_PROFILE= .config | cut -d "\"" -f 2)\033[0m"
+	echo "#"
 	echo ""
 	echo '================= .config is generated, you can build using below commands =============='
 	echo ""
