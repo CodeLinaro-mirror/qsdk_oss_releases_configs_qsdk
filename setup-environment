@@ -250,6 +250,7 @@ ret_val=$?
 if [ $ret_val == 0 ];then
 	cd $TOP_DIR
 	umask 022
+	date +%s > version.date
 	make package/symlinks
 	echo -e "\n================= Executing "make defconfig" =============="
 	make defconfig
