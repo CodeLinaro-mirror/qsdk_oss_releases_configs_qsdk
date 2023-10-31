@@ -257,7 +257,14 @@ if [ $ret_val == 0 ];then
 
 	echo -e "\033[0;32m# Selected target:      $(grep CONFIG_TARGET_BOARD= .config | cut -d "\"" -f 2)\033[0m"
 	echo -e "\033[0;32m# Selected subtarget:   $(grep CONFIG_TARGET_SUBTARGET= .config | cut -d "\"" -f 2)\033[0m"
-	echo -e "\033[0;32m# Selected profile:     "${pname}"\033[0m"
+	if grep -q -oP "CONFIG_KERNEL_KASAN=y" .config; then
+		config_ext="_Kasan";
+	elif grep -q -oP "CONFIG_DEBUG=y" .config; then
+		config_ext="_Debug";
+	else
+		config_ext="";
+	fi
+	echo -e "\033[0;32m# Selected profile:     "${pname}"$config_ext\033[0m"
 	echo "#"
 	echo ""
 	echo '================= .config is generated, you can build using below commands =============='
