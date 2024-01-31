@@ -175,6 +175,7 @@ read_inputs()
 	if [[ $input -eq 0 ]];then
 		pname="QSDK_Default"
 		echo "CONFIG_TARGET_${qsdk_target}=y" > $TOP_DIR/.config
+		echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}=y" >> $TOP_DIR/.config
 		echo CONFIG_TARGET_MULTI_PROFILE=y >> $TOP_DIR/.config
 		echo CONFIG_TARGET_ALL_PROFILES=y >> $TOP_DIR/.config
 		return 0
