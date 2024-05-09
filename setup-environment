@@ -25,10 +25,11 @@ pname=""
 #echo "Help options, Run command with -h [$0 -h]"
 usage()
 {
-	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium>] [-d <y|n>] [-i <Debug|Debug+Kasan>]" 1>&2;
+	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file>]" 1>&2;
 	echo "For eg:"
 	echo "qca/configs/qsdk/setup-environment -t ipq807x -a 32 -p premium -d n"
 	echo "qca/configs/qsdk/setup-environment -t ipq53xx -a 64 -p open -d y -i Debug"
+	echo "qca/configs/qsdk/setup-environment -t 95xx -a 32 -p 512open -c /local/mnt/workspace/ratchaya/fig/qsdk/minent.config"
 	echo "Please run \"make clean\" if this is an existing workspace"
 	exit 1;
 }
@@ -55,8 +56,9 @@ read_inputs()
 	input=""
 	debug_in=""
 	debug_input=""
+	config_file=""
 	local OPTIND
-	while getopts ":t:a:p:d:i:h" arg;do
+	while getopts ":t:a:p:d:i:c:h" arg;do
 		case "${arg}" in
 			t)
 				in_soc=${OPTARG}
@@ -98,6 +100,15 @@ read_inputs()
 					exit 1
 				fi
 				;;
+			c)
+				config_file=${OPTARG}
+				if [[ ! -f "${config_file}" ]]; then
+					echo -e "\n\033[0;31mInvalid config file passed as input - ${config_file}\033[0m"
+					usage
+					exit 1
+				fi
+				;;
+
 			h | *)
 				usage
 				exit 0
@@ -192,9 +203,21 @@ read_inputs()
 	fi
 	echo -e "\n\033[36mSelected configuration: ${qsdk_target} - ${qsdk_subtarget} - ${qsdk_profile}\033[0m"
 
+	if [ -z $config_file ]; then
+		read -p "Do you want to pass config file ? [y/n] : " config_in
+		if [[ $config_in == "y" ]]; then
+			read -p "Enter the path to config file : " config_file
+			if [[ ! -f "${config_file}" ]]; then
+					echo "Please enter a valid config file path...Exiting"
+					return 1
+			fi
+		fi
+	fi
+
 	if [ -z $debug_in ]; then
 		read -p "Debug build required ? [y/n] : " debug_in
 	fi
+
 	case $debug_in in
 		'y')    debug=("Debug" "Debug+Kasan")
 			if [ -z $debug_input ]; then
@@ -262,6 +285,9 @@ if [ $ret_val == 0 ];then
 	make package/symlinks
 	echo -e "\n================= Executing "make defconfig" =============="
 	make defconfig
+	if [[ $config_file ]]; then
+		cat $config_file >> $TOP_DIR/.config
+	fi
 
 	echo -e "\033[0;32m# Selected target:      $(grep CONFIG_TARGET_BOARD= .config | cut -d "\"" -f 2)\033[0m"
 	echo -e "\033[0;32m# Selected subtarget:   $(grep CONFIG_TARGET_SUBTARGET= .config | cut -d "\"" -f 2)\033[0m"
