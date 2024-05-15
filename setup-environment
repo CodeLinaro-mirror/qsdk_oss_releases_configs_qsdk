@@ -25,7 +25,7 @@ pname=""
 #echo "Help options, Run command with -h [$0 -h]"
 usage()
 {
-	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file>]" 1>&2;
+	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file|n>]" 1>&2;
 	echo "For eg:"
 	echo "qca/configs/qsdk/setup-environment -t ipq807x -a 32 -p premium -d n"
 	echo "qca/configs/qsdk/setup-environment -t ipq53xx -a 64 -p open -d y -i Debug"
@@ -102,7 +102,9 @@ read_inputs()
 				;;
 			c)
 				config_file=${OPTARG}
-				if [[ ! -f "${config_file}" ]]; then
+				if [[ $config_file == "n" ]]; then
+					:
+				elif [[ ! -f "${config_file}" ]]; then
 					echo -e "\n\033[0;31mInvalid config file passed as input - ${config_file}\033[0m"
 					usage
 					exit 1
