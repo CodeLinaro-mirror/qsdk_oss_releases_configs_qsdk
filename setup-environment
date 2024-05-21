@@ -191,6 +191,7 @@ read_inputs()
 		echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}=y" >> $TOP_DIR/.config
 		echo CONFIG_TARGET_MULTI_PROFILE=y >> $TOP_DIR/.config
 		echo CONFIG_TARGET_ALL_PROFILES=y >> $TOP_DIR/.config
+		echo "# CONFIG_KERNEL_WERROR is not set" >> $TOP_DIR/.config
 		return 0
 	fi
 	declare qsdk_profile=${profile[$(( $input -1 ))]}
@@ -275,6 +276,7 @@ read_inputs()
 	# Set subtarget
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}=y" >> $TOP_DIR/.config
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}_${pname}=y" >> $TOP_DIR/.config
+	echo "# CONFIG_KERNEL_WERROR is not set" >> $TOP_DIR/.config
 	return 0
 }
 
