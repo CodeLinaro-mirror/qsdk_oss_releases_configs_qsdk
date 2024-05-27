@@ -216,6 +216,19 @@ read_inputs()
 			fi
 		fi
 	fi
+	# running sed command to set ARCH for Big Endian profile
+	if [ ${qsdk_profile} == "ipq_bigendian" ]
+	then
+		if [ $arch == 64 ]
+		then
+			sed 's/ARCH:=aarch64/ARCH:=aarch64_be/g' -i $TOP_DIR/target/linux/feeds/${qsdk_target}/Makefile
+		else
+			sed 's/ARCH:=arm/ARCH:=armeb/g' -i $TOP_DIR/target/linux/feeds/${qsdk_target}/${qsdk_target}_32/target.mk
+		fi
+	else
+		sed 's/ARCH:=aarch64_be/ARCH:=aarch64/g' -i $TOP_DIR/target/linux/feeds/${qsdk_target}/Makefile
+		sed 's/ARCH:=armeb/ARCH:=arm/g' -i $TOP_DIR/target/linux/feeds/${qsdk_target}/${qsdk_target}_32/target.mk
+	fi
 
 	if [ -z $debug_in ]; then
 		read -p "Debug build required ? [y/n] : " debug_in
