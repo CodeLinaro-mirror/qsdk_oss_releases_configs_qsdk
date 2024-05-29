@@ -289,7 +289,7 @@ if [ $ret_val == 0 ];then
 	make package/symlinks
 	echo -e "\n================= Executing "make defconfig" =============="
 	make defconfig
-	if [[ $config_file ]]; then
+	if [[ -e $config_file ]]; then
 		cat $config_file >> $TOP_DIR/.config
 	fi
 
