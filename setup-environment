@@ -25,7 +25,7 @@ pname=""
 #echo "Help options, Run command with -h [$0 -h]"
 usage()
 {
-	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file|n>]" 1>&2;
+	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync>] [-r <Pebble|Waikiki>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file|n>]" 1>&2;
 	echo "For eg:"
 	echo "qca/configs/qsdk/setup-environment -t ipq807x -a 32 -p premium -d n"
 	echo "qca/configs/qsdk/setup-environment -t ipq53xx -a 64 -p open -d y -i Debug"
@@ -35,6 +35,7 @@ usage()
 }
 soc_list=("ipq807x" "ipq60xx" "ipq50xx" "ipq95xx" "ipq53xx" "ipq54xx")
 arch_list=("32" "64")
+radio_list=("Pebble" "Waikiki")
 
 populate_profile_list()
 {
@@ -57,8 +58,9 @@ read_inputs()
 	debug_in=""
 	debug_input=""
 	config_file=""
+	radio=""
 	local OPTIND
-	while getopts ":t:a:p:d:i:c:h" arg;do
+	while getopts ":t:a:p:d:i:c:r:h" arg;do
 		case "${arg}" in
 			t)
 				in_soc=${OPTARG}
@@ -78,7 +80,7 @@ read_inputs()
 				;;
 			p)
 				input=${OPTARG}
-				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" ]]; then
+				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" && "${input}" != "opensync" ]]; then
 				echo -e "\n\033[0;31mInvalid profile passed as input - ${input}\033[0m"
 					usage
 					exit 1
@@ -110,7 +112,14 @@ read_inputs()
 					exit 1
 				fi
 				;;
-
+			r)
+				radio=${OPTARG}
+				if [[ "${radio}" != "Pebble" && "${radio}" != "Waikiki" ]]; then
+					echo -e "\n\033[0;31mInvalid radio passed as input - ${radio}\033[0m"
+					usage
+					exit 1
+				fi
+				;;
 			h | *)
 				usage
 				exit 0
@@ -275,6 +284,33 @@ read_inputs()
 	# Set subtarget
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}=y" >> $TOP_DIR/.config
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}_${pname}=y" >> $TOP_DIR/.config
+
+	# Set OpenSync target
+	if [ "$pname" = "QSDK_OpenSync" ]; then
+		if [ "$qsdk_target" = "ipq54xx" ]; then
+			sed -i 's/CONFIG_OPENSYNC_TARGET="ALDER_WAIKIKI"/CONFIG_OPENSYNC_TARGET="IPQ5424_RDP466"/g' $TOP_DIR/.config
+		elif [ "$qsdk_target" = "ipq53xx" ]; then
+			if [ -z $radio ]; then
+				echo ""
+				echo -e "\t1) Pebble"
+				echo -e "\t2) Waikiki"
+				read -p "Please enter your choice of radio type[1..2] : " radio
+				echo ""
+
+				if [[ $radio -lt 1 || $radio -gt 2 ]]; then
+					echo "Wrong input.. exiting"
+					return 1
+				fi
+				radio=${radio_list[$radio-1]}
+			fi
+			if [ "$radio" = "Pebble" ]; then
+				sed -i 's/CONFIG_OPENSYNC_TARGET="ALDER_WAIKIKI"/CONFIG_OPENSYNC_TARGET="MIAMI_PEBBLE"/g' $TOP_DIR/.config
+			elif [ "$radio" = "Waikiki" ]; then
+				sed -i 's/CONFIG_OPENSYNC_TARGET="ALDER_WAIKIKI"/CONFIG_OPENSYNC_TARGET="MIAMI_WAIKIKI"/g' $TOP_DIR/.config
+			fi
+		fi
+	fi
+
 	return 0
 }
 
