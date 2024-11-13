@@ -255,6 +255,9 @@ read_inputs()
 				1)	if [[ "$pname" = QSDK_16M ]];then
 					       cat $SCRIPT_DIR/${pfile}.config \
 						       $SCRIPT_DIR/ipq_debug_16M > $TOP_DIR/.config
+					elif [[ "$pname" = QSDK_256 ]];then
+						cat $SCRIPT_DIR/${pfile}.config\
+							$SCRIPT_DIR/ipq_debug_256M > $TOP_DIR/.config
 				       else
 					       cat $SCRIPT_DIR/${pfile}.config \
 						       $SCRIPT_DIR/ipq_debug > $TOP_DIR/.config
