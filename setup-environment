@@ -25,7 +25,7 @@ pname=""
 #echo "Help options, Run command with -h [$0 -h]"
 usage()
 {
-	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file|n>]" 1>&2;
+	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file|n>] [-e <true|false>]" 1>&2;
 	echo "For eg:"
 	echo "qca/configs/qsdk/setup-environment -t ipq807x -a 32 -p premium -d n"
 	echo "qca/configs/qsdk/setup-environment -t ipq53xx -a 64 -p open -d y -i Debug"
@@ -59,8 +59,9 @@ read_inputs()
 	debug_input=""
 	config_file=""
 	radio=""
+	patch_based_build=""
 	local OPTIND
-	while getopts ":t:a:p:d:i:c:h" arg;do
+	while getopts ":t:a:p:d:i:c:e:h" arg;do
 		case "${arg}" in
 			t)
 				in_soc=${OPTARG}
@@ -108,6 +109,14 @@ read_inputs()
 					:
 				elif [[ ! -f "${config_file}" ]]; then
 					echo -e "\n\033[0;31mInvalid config file passed as input - ${config_file}\033[0m"
+					usage
+					exit 1
+				fi
+				;;
+			e)
+				patch_based_build=${OPTARG}
+				if [[ "${patch_based_build}" != "true" && "${patch_based_build}" != "false" ]]; then
+					echo -e "\n\033[0;31mInvalid value passed as input for patch based build - ${patch_based_build}\033[0m"
 					usage
 					exit 1
 				fi
@@ -287,6 +296,14 @@ read_inputs()
 	# Set subtarget
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}=y" >> $TOP_DIR/.config
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}_${pname}=y" >> $TOP_DIR/.config
+
+	#patch based build
+	if [ "$patch_based_build" == "true" ]; then
+		cp -rf $TOP_DIR/target/linux/feeds/patches-6.6 $TOP_DIR/target/linux/feeds/${qsdk_target}
+		cp -rf $TOP_DIR/target/linux/feeds/files-6.6 $TOP_DIR/target/linux/feeds/${qsdk_target}
+		rm -rf $TOP_DIR/target/linux/generic/files/
+		echo "# CONFIG_LINUX_IS_FLATTENED_TREE is not set"  >> $TOP_DIR/.config
+	fi
 
 	# Set OpenSync target
 	if [ "$pname" = "QSDK_OpenSync" ]; then
