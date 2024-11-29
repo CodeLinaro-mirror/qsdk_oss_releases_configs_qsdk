@@ -80,7 +80,7 @@ read_inputs()
 				;;
 			p)
 				input=${OPTARG}
-				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" && "${input}" != "opensync" ]]; then
+				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" && "${input}" != "opensync" && "${input}" != "minent" ]]; then
 				echo -e "\n\033[0;31mInvalid profile passed as input - ${input}\033[0m"
 					usage
 					exit 1
