@@ -290,6 +290,12 @@ read_inputs()
 
 	# Set OpenSync target
 	if [ "$pname" = "QSDK_OpenSync" ]; then
+		[ ! -e $TOP_DIR/qca/src/linux-6.6/.opensync ] && {
+			cd $TOP_DIR/qca/src/linux-6.6
+			patch -s -p1 -N < ../../../opensync/ipq-patches/qca/src/linux-6.6/local_kernel_netfilter_fix.patch
+			touch .opensync
+			cd -
+		}
 		if [ "$qsdk_target" = "ipq54xx" ]; then
 			sed -i 's/CONFIG_OPENSYNC_TARGET="ALDER_WAIKIKI"/CONFIG_OPENSYNC_TARGET="IPQ5424_RDP466"/g' $TOP_DIR/.config
 		elif [ "$qsdk_target" = "ipq53xx" ]; then
