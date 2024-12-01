@@ -65,7 +65,7 @@ read_inputs()
 		case "${arg}" in
 			t)
 				in_soc=${OPTARG}
-				if [[ "${in_soc}" != "ipq807x" && "${in_soc}" != "ipq60xx" && "${in_soc}" != "ipq50xx" && "${in_soc}" != "ipq95xx" && "${in_soc}" != "ipq53xx" && "${in_soc}" != "ipq53xxP" && "${in_soc}" != "ipq53xxW" && "${in_soc}" != "ipq54xx" ]]; then
+				if [[ "${in_soc}" != "ipq95xx" && "${in_soc}" != "ipq53xx" && "${in_soc}" != "ipq53xxP" && "${in_soc}" != "ipq53xxW" && "${in_soc}" != "ipq54xx" ]]; then
 					echo -e "\n\033[0;31mInvalid target passed as input - ${in_soc}\033[0m"
 					usage
 					exit 1
@@ -139,12 +139,9 @@ read_inputs()
 
 	if [ -z $in_soc ]; then
 		echo ""
-		echo -e "\t1) ipq807x ( Hawkeye )"
-		echo -e "\t2) ipq60xx ( Cypress )"
-		echo -e "\t3) ipq50xx ( Maple ) "
-		echo -e "\t4) ipq95xx ( Alder ) "
-		echo -e "\t5) ipq53xx ( Miami ) "
-		echo -e "\t6) ipq54xx ( Marina )"
+		echo -e "\t1) ipq95xx ( Alder ) "
+		echo -e "\t2) ipq53xx ( Miami ) "
+		echo -e "\t3) ipq54xx ( Marina )"
 		read -p "Please enter your choice of target[1..6] : " in_soc
 		echo ""
 
@@ -346,6 +343,7 @@ if [ $ret_val == 0 ];then
 	cd $TOP_DIR
 	umask 022
 	date +%s > version.date
+	rm -rf tmp
 	make package/symlinks
 	echo -e "\n================= Executing "make defconfig" =============="
 	make defconfig
