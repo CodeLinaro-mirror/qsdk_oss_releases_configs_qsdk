@@ -25,15 +25,15 @@ pname=""
 #echo "Help options, Run command with -h [$0 -h]"
 usage()
 {
-	echo "Usage: qca/configs/qsdk/setup-environment [-t <ipq807x|ipq60xx|ipq50xx|ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file|n>]" 1>&2;
+	echo "Usage: qca/configs/qsdk/setup-environment [-t ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file|n>] [-e <true|false>]" 1>&2;
 	echo "For eg:"
-	echo "qca/configs/qsdk/setup-environment -t ipq807x -a 32 -p premium -d n"
+	echo "qca/configs/qsdk/setup-environment -t ipq95xx -a 32 -p premium -d n"
 	echo "qca/configs/qsdk/setup-environment -t ipq53xx -a 64 -p open -d y -i Debug"
-	echo "qca/configs/qsdk/setup-environment -t 95xx -a 32 -p 512open -c /local/mnt/workspace/ratchaya/fig/qsdk/minent.config"
+	echo "qca/configs/qsdk/setup-environment -t ipq95xx -a 32 -p 512open -c minent.config"
 	echo "Please run \"make clean\" if this is an existing workspace"
 	exit 1;
 }
-soc_list=("ipq807x" "ipq60xx" "ipq50xx" "ipq95xx" "ipq53xx" "ipq54xx")
+soc_list=("ipq95xx" "ipq53xx" "ipq54xx")
 arch_list=("32" "64")
 radio_list=("Pebble" "Waikiki")
 
@@ -59,12 +59,13 @@ read_inputs()
 	debug_input=""
 	config_file=""
 	radio=""
+	patch_based_build=""
 	local OPTIND
-	while getopts ":t:a:p:d:i:c:h" arg;do
+	while getopts ":t:a:p:d:i:c:e:h" arg;do
 		case "${arg}" in
 			t)
 				in_soc=${OPTARG}
-				if [[ "${in_soc}" != "ipq807x" && "${in_soc}" != "ipq60xx" && "${in_soc}" != "ipq50xx" && "${in_soc}" != "ipq95xx" && "${in_soc}" != "ipq53xx" && "${in_soc}" != "ipq53xxP" && "${in_soc}" != "ipq53xxW" && "${in_soc}" != "ipq54xx" ]]; then
+				if [[ "${in_soc}" != "ipq95xx" && "${in_soc}" != "ipq53xx" && "${in_soc}" != "ipq53xxP" && "${in_soc}" != "ipq53xxW" && "${in_soc}" != "ipq54xx" ]]; then
 					echo -e "\n\033[0;31mInvalid target passed as input - ${in_soc}\033[0m"
 					usage
 					exit 1
@@ -80,7 +81,7 @@ read_inputs()
 				;;
 			p)
 				input=${OPTARG}
-				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" && "${input}" != "opensync" ]]; then
+				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" && "${input}" != "opensync" && "${input}" != "minent" ]]; then
 				echo -e "\n\033[0;31mInvalid profile passed as input - ${input}\033[0m"
 					usage
 					exit 1
@@ -112,6 +113,14 @@ read_inputs()
 					exit 1
 				fi
 				;;
+			e)
+				patch_based_build=${OPTARG}
+				if [[ "${patch_based_build}" != "true" && "${patch_based_build}" != "false" ]]; then
+					echo -e "\n\033[0;31mInvalid value passed as input for patch based build - ${patch_based_build}\033[0m"
+					usage
+					exit 1
+				fi
+				;;
 			h | *)
 				usage
 				exit 0
@@ -130,12 +139,9 @@ read_inputs()
 
 	if [ -z $in_soc ]; then
 		echo ""
-		echo -e "\t1) ipq807x ( Hawkeye )"
-		echo -e "\t2) ipq60xx ( Cypress )"
-		echo -e "\t3) ipq50xx ( Maple ) "
-		echo -e "\t4) ipq95xx ( Alder ) "
-		echo -e "\t5) ipq53xx ( Miami ) "
-		echo -e "\t6) ipq54xx ( Marina )"
+		echo -e "\t1) ipq95xx ( Alder ) "
+		echo -e "\t2) ipq53xx ( Miami ) "
+		echo -e "\t3) ipq54xx ( Marina )"
 		read -p "Please enter your choice of target[1..6] : " in_soc
 		echo ""
 
@@ -288,8 +294,22 @@ read_inputs()
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}=y" >> $TOP_DIR/.config
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}_${pname}=y" >> $TOP_DIR/.config
 
+	#patch based build
+	if [ "$patch_based_build" == "true" ]; then
+		cp -rf $TOP_DIR/target/linux/feeds/patches-6.6 $TOP_DIR/target/linux/feeds/${qsdk_target}
+		cp -rf $TOP_DIR/target/linux/feeds/files-6.6 $TOP_DIR/target/linux/feeds/${qsdk_target}
+		rm -rf $TOP_DIR/target/linux/generic/files/
+		echo "# CONFIG_LINUX_IS_FLATTENED_TREE is not set"  >> $TOP_DIR/.config
+	fi
+
 	# Set OpenSync target
 	if [ "$pname" = "QSDK_OpenSync" ]; then
+		[ ! -e $TOP_DIR/qca/src/linux-6.6/.opensync ] && {
+			cd $TOP_DIR/qca/src/linux-6.6
+			patch -s -p1 -N < ../../../opensync/ipq-patches/qca/src/linux-6.6/local_kernel_netfilter_fix.patch
+			touch .opensync
+			cd -
+		}
 		if [ "$qsdk_target" = "ipq54xx" ]; then
 			sed -i 's/CONFIG_OPENSYNC_TARGET="ALDER_WAIKIKI"/CONFIG_OPENSYNC_TARGET="IPQ5424_RDP466"/g' $TOP_DIR/.config
 		elif [ "$qsdk_target" = "ipq53xx" ]; then
@@ -323,6 +343,7 @@ if [ $ret_val == 0 ];then
 	cd $TOP_DIR
 	umask 022
 	date +%s > version.date
+	rm -rf tmp
 	make package/symlinks
 	echo -e "\n================= Executing "make defconfig" =============="
 	make defconfig
