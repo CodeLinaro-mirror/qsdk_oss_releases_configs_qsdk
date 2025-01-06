@@ -213,7 +213,7 @@ read_inputs()
 	pname=${profile_name[$(( $input -1 ))]}
 
 	if [ "$arch" -eq "64" ];then
-		if [[ $qsdk_profile == *"512"* || $qsdk_profile == *"256"* || $qsdk_profile == *"16"* ]];then
+		if [[ $qsdk_profile == *"256"* || $qsdk_profile == *"16"* ]];then
 			echo -e "\033[0;31m$qsdk_profile is not supported for 64 build type..\033[0m"
 			return 1
 		fi
