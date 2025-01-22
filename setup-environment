@@ -294,6 +294,11 @@ read_inputs()
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}=y" >> $TOP_DIR/.config
 	echo "CONFIG_TARGET_${qsdk_target}_${qsdk_subtarget}_${pname}=y" >> $TOP_DIR/.config
 
+	#apply configs if config file is passed as input
+	if [[ -e $config_file ]]; then
+		cat $config_file >> $TOP_DIR/.config
+	fi
+
 	#patch based build
 	if [ "$patch_based_build" == "true" ]; then
 		cp -rf $TOP_DIR/target/linux/feeds/patches-6.6 $TOP_DIR/target/linux/feeds/${qsdk_target}
@@ -347,9 +352,6 @@ if [ $ret_val == 0 ];then
 	make package/symlinks
 	echo -e "\n================= Executing "make defconfig" =============="
 	make defconfig
-	if [[ -e $config_file ]]; then
-		cat $config_file >> $TOP_DIR/.config
-	fi
 
 	echo -e "\033[0;32m# Selected target:      $(grep CONFIG_TARGET_BOARD= .config | cut -d "\"" -f 2)\033[0m"
 	echo -e "\033[0;32m# Selected subtarget:   $(grep CONFIG_TARGET_SUBTARGET= .config | cut -d "\"" -f 2)\033[0m"
