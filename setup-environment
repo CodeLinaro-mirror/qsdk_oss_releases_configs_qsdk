@@ -296,6 +296,7 @@ read_inputs()
 
 	#patch based build
 	if [ "$patch_based_build" == "true" ]; then
+		rm -rf $TOP_DIR/target/linux/feeds/{files-6.6,patches-6.6}/.git
 		cp -rf $TOP_DIR/target/linux/feeds/patches-6.6 $TOP_DIR/target/linux/feeds/${qsdk_target}
 		cp -rf $TOP_DIR/target/linux/feeds/files-6.6 $TOP_DIR/target/linux/feeds/${qsdk_target}
 		rm -rf $TOP_DIR/target/linux/generic/files/ $TOP_DIR/target/linux/generic/backport-6.6 $TOP_DIR/target/linux/generic/hack-6.6 $TOP_DIR/target/linux/generic/pending-6.6
