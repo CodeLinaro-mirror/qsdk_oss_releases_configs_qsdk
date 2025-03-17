@@ -301,6 +301,9 @@ read_inputs()
 
 	#patch based build
 	if [ "$patch_based_build" == "true" ]; then
+		if [ "$pname" = "QSDK_OpenSync" ]; then
+			cp $TOP_DIR/opensync/ipq-patches/qca/src/linux-6.6/local_kernel_netfilter_fix.patch $TOP_DIR/target/linux/feeds/patches-6.6/2000-local_kernel_netfilter_fix.patch
+		fi
 		rm -rf $TOP_DIR/target/linux/feeds/{files-6.6,patches-6.6}/.git
 		cp -rf $TOP_DIR/target/linux/feeds/patches-6.6 $TOP_DIR/target/linux/feeds/${qsdk_target}
 		cp -rf $TOP_DIR/target/linux/feeds/files-6.6 $TOP_DIR/target/linux/feeds/${qsdk_target}
