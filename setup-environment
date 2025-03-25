@@ -362,7 +362,17 @@ if [ $ret_val == 0 ];then
 	else
 		config_ext="";
 	fi
+	if [[ $pfile == *"256"* ]];then
+		low_mem="LM256";
+	elif [[ $pfile == *"512"* ]];then
+		low_mem="LM512";
+	else
+		low_mem="";
+	fi
 	echo -e "\033[0;32m# Selected profile:     "${pname}"$config_ext\033[0m"
+	if [ $low_mem ];then
+		echo -e "\033[0;32m# Selected mem profile: "$low_mem"\033[0m"
+	fi
 	echo "#"
 	echo ""
 	echo '================= .config is generated, you can build using below commands =============='
