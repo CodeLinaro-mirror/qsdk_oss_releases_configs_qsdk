@@ -353,6 +353,14 @@ if [ $ret_val == 0 ];then
 	umask 022
 	date +%s > version.date
 	rm -rf tmp
+	unset LIB
+	unset LD_LIBRARY_PATH
+	unset prefix
+	unset PERL5LIB
+	unset PERL_MB_OPT
+	unset PERL_LOCAL_LIB_ROOT
+	echo -e "ENV Output:"
+	env
 	make package/symlinks
 	echo -e "\n================= Executing "make defconfig" =============="
 	make defconfig
