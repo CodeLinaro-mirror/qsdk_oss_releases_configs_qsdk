@@ -25,7 +25,7 @@ pname=""
 #echo "Help options, Run command with -h [$0 -h]"
 usage()
 {
-	echo "Usage: qca/configs/qsdk/setup-environment [-t ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync|minimalopenwrt>] [-d <y|n>] [-i <Debug|Debug+Kasan>] [-c <path to config file|n>] [-e <true|false>]" 1>&2;
+	echo "Usage: qca/configs/qsdk/setup-environment [-t ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync|minimalopenwrt>] [-d <y|n>] [-i <Debug|Debug+Kasan|KUNIT+GCOV|KUNIT+CTC++>] [-c <path to config file|n>] [-e <true|false>]" 1>&2;
 	echo "For eg:"
 	echo "qca/configs/qsdk/setup-environment -t ipq95xx -a 32 -p premium -d n"
 	echo "qca/configs/qsdk/setup-environment -t ipq53xx -a 64 -p open -d y -i Debug"
@@ -97,7 +97,7 @@ read_inputs()
 				;;
 			i)
 				debug_input=${OPTARG}
-				if [[ "${debug_input}" != "Debug" && "${debug_input}" != "Debug+Kasan" ]]; then
+				if [[ "${debug_input}" != "Debug" && "${debug_input}" != "Debug+Kasan" && "${debug_input}" != "KUNIT+GCOV" && "${debug_input}" != "KUNIT+CTC++" ]]; then
 					echo -e "\n\033[0;31mInvalid debug profile passed as input - ${debug_input}\033[0m"
 					usage
 					exit 1
@@ -238,9 +238,9 @@ read_inputs()
 	fi
 
 	case $debug_in in
-		'y')    debug=("Debug" "Debug+Kasan")
+		'y')    debug=("Debug" "Debug+Kasan" "KUNIT+GCOV" "KUNIT+CTC++")
 			if [ -z $debug_input ]; then
-				debug=("Debug" "Debug+Kasan")
+				#debug=("Debug" "Debug+Kasan" "KUNIT+GCOV" "KUNIT+CTC++")
 				# Check for debug builds
 				index=1
 				for i in ${debug[@]};do
@@ -274,6 +274,13 @@ read_inputs()
 
 				2)	cat $SCRIPT_DIR/${pfile}.config \
 					       $SCRIPT_DIR/ipq_debug_kasan > $TOP_DIR/.config
+				       ;;
+				3)	echo " ------KUNIT+GCOV is enabled------ "
+					cat $SCRIPT_DIR/${pfile}.config \
+						$SCRIPT_DIR/ipq_kunit > $TOP_DIR/.config
+				       ;;
+				4)	echo " CTC++ support is not supported yet... "
+					return 1
 				       ;;
 
 				*)	echo "Wrong input .... exiting"
@@ -373,6 +380,8 @@ if [ $ret_val == 0 ];then
 		config_ext="_Kasan";
 	elif grep -q -oP "CONFIG_DEBUG=y" .config; then
 		config_ext="_Debug";
+	elif grep -q -oP "CONFIG_KERNEL_KUNIT=y" .config; then
+		config_ext="_Debug_KUNIT";
 	else
 		config_ext="";
 	fi
