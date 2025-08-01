@@ -25,7 +25,7 @@ pname=""
 #echo "Help options, Run command with -h [$0 -h]"
 usage()
 {
-	echo "Usage: qca/configs/qsdk/setup-environment [-t ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync|minimalopenwrt|sfu|256open>] [-d <y|n>] [-i <Debug|Debug+Kasan|KUNIT+GCOV|KUNIT+CTC++>] [-c <path to config file|n>] [-e <true|false>]" 1>&2;
+	echo "Usage: qca/configs/qsdk/setup-environment [-t ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync|minimalopenwrt|sfu>] [-d <y|n>] [-i <Debug|Debug+Kasan|KUNIT+GCOV|KUNIT+CTC++>] [-c <path to config file|n>] [-e <true|false>]" 1>&2;
 	echo "For eg:"
 	echo "qca/configs/qsdk/setup-environment -t ipq95xx -a 32 -p premium -d n"
 	echo "qca/configs/qsdk/setup-environment -t ipq53xx -a 64 -p open -d y -i Debug"
@@ -33,7 +33,7 @@ usage()
 	echo "Please run \"make clean\" if this is an existing workspace"
 	exit 1;
 }
-soc_list=("ipq95xx" "ipq53xx" "ipq54xx" "ipq52xx" "ipq96xx")
+soc_list=("ipq95xx" "ipq53xx" "ipq54xx" )
 arch_list=("32" "64")
 radio_list=("Pebble" "Waikiki")
 
@@ -65,7 +65,7 @@ read_inputs()
 		case "${arg}" in
 			t)
 				in_soc=${OPTARG}
-				if [[ "${in_soc}" != "ipq95xx" && "${in_soc}" != "ipq53xx" && "${in_soc}" != "ipq53xxP" && "${in_soc}" != "ipq53xxW" && "${in_soc}" != "ipq54xx" && "${in_soc}" != "ipq52xx" && "${in_soc}" != "ipq96xx" ]]; then
+				if [[ "${in_soc}" != "ipq95xx" && "${in_soc}" != "ipq53xx" && "${in_soc}" != "ipq53xxP" && "${in_soc}" != "ipq53xxW" && "${in_soc}" != "ipq54xx" ]]; then
 					echo -e "\n\033[0;31mInvalid target passed as input - ${in_soc}\033[0m"
 					usage
 					exit 1
@@ -81,7 +81,7 @@ read_inputs()
 				;;
 			p)
 				input=${OPTARG}
-				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" && "${input}" != "opensync" && "${input}" != "minent" && "${input}" != "minimalopenwrt" && "${input}" != "sfu" && "${input}" != "256open"  ]]; then
+				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" && "${input}" != "opensync" && "${input}" != "minent" && "${input}" != "minimalopenwrt" && "${input}" != "sfu" ]]; then
 				echo -e "\n\033[0;31mInvalid profile passed as input - ${input}\033[0m"
 					usage
 					exit 1
@@ -142,12 +142,10 @@ read_inputs()
 		echo -e "\t1) ipq95xx ( Alder ) "
 		echo -e "\t2) ipq53xx ( Miami ) "
 		echo -e "\t3) ipq54xx ( Marina )"
-		echo -e "\t4) ipq52xx ( Hermosa )"
-		echo -e "\t5) ipq96xx ( Juhu )"
-		read -p "Please enter your choice of target[1..6] : " in_soc
+		read -p "Please enter your choice of target[1..3] : " in_soc
 		echo ""
 
-		if [[ $in_soc -lt 1 || $in_soc -gt 6 ]]; then
+		if [[ $in_soc -lt 1 || $in_soc -gt 3 ]]; then
 			echo "Wrong input.. exiting"
 			return 1
 		fi
