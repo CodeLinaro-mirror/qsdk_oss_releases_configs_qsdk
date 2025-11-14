@@ -25,7 +25,7 @@ pname=""
 #echo "Help options, Run command with -h [$0 -h]"
 usage()
 {
-	echo "Usage: qca/configs/qsdk/setup-environment [-t ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync|minimalopenwrt|sfu>] [-d <y|n>] [-i <Debug|Debug+Kasan|KUNIT+GCOV|KUNIT+CTC++>] [-c <path to config file|n>] [-e <true|false>]" 1>&2;
+	echo "Usage: qca/configs/qsdk/setup-environment [-t ipq95xx|ipq53xx|ipq54xx>] [-a <32|64>] [-p <256|512|16M|512enterprise|512open|bigendian|enterprise|open|premium|opensync|minimalopenwrt|sfu|minentopen>] [-d <y|n>] [-i <Debug|Debug+Kasan|KUNIT+GCOV|KUNIT+CTC++>] [-c <path to config file|n>] [-e <true|false>]" 1>&2;
 	echo "For eg:"
 	echo "qca/configs/qsdk/setup-environment -t ipq95xx -a 32 -p premium -d n"
 	echo "qca/configs/qsdk/setup-environment -t ipq53xx -a 64 -p open -d y -i Debug"
@@ -81,7 +81,7 @@ read_inputs()
 				;;
 			p)
 				input=${OPTARG}
-				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" && "${input}" != "opensync" && "${input}" != "minent" && "${input}" != "minimalopenwrt" && "${input}" != "sfu" ]]; then
+				if [[ "${input}" != "256" && "${input}" != "512" && "${input}" != "16M" && "${input}" != "512enterprise" && "${input}" != "512open" && "${input}" != "bigendian" && "${input}" != "enterprise" && "${input}" != "enterprise" && "${input}" != "open" && "${input}" != "premium" && "${input}" != "opensync" && "${input}" != "minent" && "${input}" != "minimalopenwrt" && "${input}" != "sfu" && "${input}" != "minentopen" ]]; then
 				echo -e "\n\033[0;31mInvalid profile passed as input - ${input}\033[0m"
 					usage
 					exit 1
