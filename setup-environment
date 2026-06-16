@@ -33,7 +33,7 @@ usage()
 	echo "Please run \"make clean\" if this is an existing workspace"
 	exit 1;
 }
-soc_list=("ipq95xx" "ipq53xx" "ipq54xx" "ipq52xx" "ipq96xx")
+soc_list=("ipq95xx" "ipq53xx" "ipq54xx" "ipq52xx" "ipq96xx" "ipq56xx")
 arch_list=("32" "64")
 radio_list=("Pebble" "Waikiki")
 
@@ -65,7 +65,7 @@ read_inputs()
 		case "${arg}" in
 			t)
 				in_soc=${OPTARG}
-				if [[ "${in_soc}" != "ipq95xx" && "${in_soc}" != "ipq53xx" && "${in_soc}" != "ipq53xxP" && "${in_soc}" != "ipq53xxW" && "${in_soc}" != "ipq54xx" && "${in_soc}" != "ipq52xx" && "${in_soc}" != "ipq96xx" ]]; then
+				if [[ "${in_soc}" != "ipq95xx" && "${in_soc}" != "ipq53xx" && "${in_soc}" != "ipq53xxP" && "${in_soc}" != "ipq53xxW" && "${in_soc}" != "ipq54xx" && "${in_soc}" != "ipq52xx" && "${in_soc}" != "ipq96xx" && "${in_soc}" != "ipq56xx" ]]; then
 					echo -e "\n\033[0;31mInvalid target passed as input - ${in_soc}\033[0m"
 					usage
 					exit 1
@@ -144,6 +144,7 @@ read_inputs()
 		echo -e "\t3) ipq54xx ( Marina )"
 		echo -e "\t4) ipq52xx ( Hermosa )"
 		echo -e "\t5) ipq96xx ( Juhu )"
+		echo -e "\t6) ipq56xx ( Belmar )"
 		read -p "Please enter your choice of target[1..6] : " in_soc
 		echo ""
 
